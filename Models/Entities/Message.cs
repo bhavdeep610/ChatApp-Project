@@ -1,4 +1,4 @@
-﻿using ChatApp.Data.Entity;
+﻿using ChatApp.Models.Entities;
 
 public class Message
 {

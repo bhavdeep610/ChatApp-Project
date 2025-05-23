@@ -1,34 +1,75 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using ChatApp.Models.DTOs;
+using ChatApp.Models.Entities;
+using ChatApp.Data;
+using ChatApp.Interfaces;
+using ChatApp.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ApplicationDbContext>
-    (options => options.UseMySql(builder.Configuration.GetConnectionString("ChatAppConnection")
-    ,ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ChatAppConnection"))));
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("ChatAppConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ChatAppConnection"))
+    ));
 
-builder.Services.AddControllersWithViews();
+// Custom Auth Service
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Configure JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)
+            )
+        };
+    });
+
+// Add controllers & Swagger
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Auto migrate database (optional: seed roles manually if needed)
 using (var scope = app.Services.CreateScope())
 {
-    var Context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    Context.Database.Migrate();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    context.Database.Migrate();
 
+    // Optional: Manual role seeding
+    if (!context.AppRoles.Any())
+    {
+        context.AppRoles.AddRange(
+            new ChatApp.Models.Entities.AppRoles { RoleName = "Admin" },
+            new ChatApp.Models.Entities.AppRoles { RoleName = "User" }
+        );
+        context.SaveChanges();
+    }
 }
-if(app.Environment.IsDevelopment())
+
+if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
+
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-
-    app.MapGet("/", () => "Hello World!");
-
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 app.Run();

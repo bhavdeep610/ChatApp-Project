@@ -1,18 +1,22 @@
-﻿using ChatApp.Data.Entity;
+﻿using System.Data;
+using ChatApp.Models.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+namespace ChatApp.Data;
+
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+
 {
-    public DbSet<Roles> Roles { get; set; }
+    public DbSet<AppRoles> AppRoles { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // ---- ROLES CONFIG ----
-        modelBuilder.Entity<Roles>(e =>
+        modelBuilder.Entity<AppRoles>(e =>
         {
             e.ToTable("role");
             e.HasKey(r => r.RoleId);
@@ -26,13 +30,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 .HasColumnName("role_name");
         });
 
-        modelBuilder.Entity<Roles>().HasData(
-            new Roles
+        modelBuilder.Entity<AppRoles>().HasData(
+            new AppRoles
             {
                 RoleId = 1,
                 RoleName = "Admin"
             },
-            new Roles
+            new AppRoles
             {
                 RoleId = 2,
                 RoleName = "User"
@@ -84,7 +88,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 Email = "admin@gmail.com",
                 RoleId = 1,
                 Created = DateTime.UtcNow,
-                
+
             },
             new User
             {
@@ -94,7 +98,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 Email = "receiver@gmail.com",
                 RoleId = 2,
                 Created = DateTime.UtcNow,
-                
+
             },
             new User
             {
@@ -149,4 +153,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             }
         );
     }
+
 }

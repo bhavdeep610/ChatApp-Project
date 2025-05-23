@@ -1,12 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
-namespace ChatApp.Data.Entity
+namespace ChatApp.Models.Entities
 {
-    public class Roles
+    public class AppRoles 
     {
+
         public int RoleId { get; set; }
 
         public string RoleName { get; set; }
+
+        public ICollection<User> Users { get; set; }
+
     }
+
 }
