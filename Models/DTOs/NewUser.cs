@@ -2,7 +2,7 @@
 
 namespace ChatApp.Models.DTOs
 {
-    public class NewUserDtos
+    public class NewUser
     {
 
         public string UserName { get; set; }

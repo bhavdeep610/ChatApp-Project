@@ -1,11 +1,8 @@
 ﻿using ChatApp.Data;
 using ChatApp.Interfaces;
 using ChatApp.Models.DTOs;
-using ChatApp.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Crypto.Generators;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,7 +20,7 @@ namespace ChatApp.Service
             _configuration = configuration;
         }
 
-        public async Task<string> RegisterAsync(RegisterDtos dto)
+        public async Task<string> RegisterAsync(Register dto)
         {
             // Check if user exists
             if (await _context.Users.AnyAsync(u => u.UserName == dto.Username))
@@ -52,7 +49,7 @@ namespace ChatApp.Service
             return "Registration successful";
         }
 
-        public async Task<string?> LoginAsync(LoginDtos dto)
+        public async Task<string?> LoginAsync(Login dto)
         {
             var user = await _context.Users
                 .Include(u => u.Role)

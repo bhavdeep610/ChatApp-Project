@@ -1,12 +1,7 @@
-﻿   
+﻿
 using ChatApp.Models.DTOs;
 using ChatApp.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using ChatApp.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ChatApp.Models.Entities;
-using ChatApp.Interfaces;
 namespace ChatApp.Controllers
 {
     [Route("api/[controller]")]
@@ -21,7 +16,7 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDtos dto)
+        public async Task<IActionResult> Register(Register dto)
         {
             var result = await _authService.RegisterAsync(dto);
             if (result == "User already exists")
@@ -30,7 +25,7 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDtos dto)
+        public async Task<IActionResult> Login(Login dto)
         {
             var token = await _authService.LoginAsync(dto);
             if (token == null)

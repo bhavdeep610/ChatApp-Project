@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using ChatApp.Models.DTOs;
 using ChatApp.Models.Entities;
 using ChatApp.Data;
 using ChatApp.Interfaces;
 using ChatApp.Service;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Custom Auth Service
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Configure JWT Authentication
+// JWT Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -38,38 +38,86 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add controllers & Swagger
+// Swagger setup
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "ChatApp API", Version = "v1" });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by your JWT token."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// ✅ COMPLETELY OPEN CORS FOR DEVELOPMENT
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowViteDevClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // optional, only if you're using cookies/auth
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Auto migrate database (optional: seed roles manually if needed)
+// Auto migrate & seed roles
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     context.Database.Migrate();
 
-    // Optional: Manual role seeding
     if (!context.AppRoles.Any())
     {
         context.AppRoles.AddRange(
-            new ChatApp.Models.Entities.AppRoles { RoleName = "Admin" },
-            new ChatApp.Models.Entities.AppRoles { RoleName = "User" }
+            new AppRoles { RoleName = "Admin" },
+            new AppRoles { RoleName = "User" }
         );
         context.SaveChanges();
     }
 }
 
+// Dev tools
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// ❌ DISABLE HTTPS REDIRECTION FOR DEVELOPMENT
+// app.UseHttpsRedirection();
+
+// ✅ USE DEFAULT CORS POLICY
+app.UseCors("AllowViteDevClient");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

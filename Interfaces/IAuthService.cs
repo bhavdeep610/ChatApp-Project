@@ -1,5 +1,4 @@
 ﻿using ChatApp.Models.DTOs;
-using ChatApp.Models.Entities;
 
 namespace ChatApp.Interfaces
 {
@@ -7,12 +6,15 @@ namespace ChatApp.Interfaces
 
         public interface IAuthService
         {
-            Task<string> RegisterAsync(RegisterDtos registerDto);
-            Task<string> LoginAsync(LoginDtos loginDto);
+            Task<string> RegisterAsync(Register registerDto);
+            Task<string> LoginAsync(Login loginDto);
+
+
+
         }
 
 
 
-    }
+}
 
 

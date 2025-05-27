@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ChatApp.Controllers
+namespace ChatApp.Controllers   
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -2,7 +2,7 @@
 
 namespace ChatApp.Models.DTOs
 {
-    public class LoginDtos
+    public class Login
     {
         
         [Required]

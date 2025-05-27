@@ -2,7 +2,7 @@
 
 namespace ChatApp.Models.DTOs
 {
-    public class RegisterDtos
+    public class Register
     {
 
         [Required]
