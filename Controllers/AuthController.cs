@@ -31,6 +31,8 @@ namespace ChatApp.Controllers
             if (token == null)
                 return Unauthorized("Invalid credentials");
             return Ok(new { Token = token });
+       
         }
+
     }
 }

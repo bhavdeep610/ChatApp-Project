@@ -13,6 +13,8 @@ namespace ChatApp.Models.DTOs
         [Required]
         public string? Password { get; set; }
 
+        public DateTime Created { get; set; } 
+
         public int RoleId { get; set; } = 1; // Default role ID
 
     }

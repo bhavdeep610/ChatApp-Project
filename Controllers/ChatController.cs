@@ -91,4 +91,38 @@ public class ChatController : ControllerBase
 
         return NoContent();
     }
+    [HttpGet("users")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        int currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        var users = await _context.Users
+            .Where(u => u.Id != currentUserId) // exclude self
+            .Select(u => new
+            {
+                u.Id,
+                u.UserName
+            })
+            .ToListAsync();
+
+        return Ok(users);
+    }
+    [HttpGet("all")]
+    public async Task<ActionResult<IEnumerable<Message>>> GetAllMessages()
+    {
+        try
+        {
+            var messages = await _context.Messages
+                .OrderByDescending(m => m.Created)
+                .ToListAsync();
+
+            return Ok(messages);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+
+    }
+
 }

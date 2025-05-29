@@ -40,7 +40,8 @@ namespace ChatApp.Service
                 UserName = dto.Username,
                 Email = dto.Email,
                 PasswordHash = passwordHash,
-                RoleId = dto.RoleId
+                RoleId = dto.RoleId,
+                Created = DateTime.UtcNow,
             };
 
             _context.Users.Add(user);

@@ -33,6 +33,26 @@
   },
   {
     "ContainingType": "ChatApp.Controllers.ChatController",
+    "Method": "GetAllMessages",
+    "RelativePath": "api/Chat/all",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[Message, ChatApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "ChatApp.Controllers.ChatController",
     "Method": "DeleteMessage",
     "RelativePath": "api/Chat/delete/{id}",
     "HttpMethod": "DELETE",
@@ -98,6 +118,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ChatApp.Controllers.ChatController",
+    "Method": "GetAllUsers",
+    "RelativePath": "api/Chat/users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
